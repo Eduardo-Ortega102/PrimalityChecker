@@ -1,12 +1,9 @@
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Random;
 
 import static java.lang.StrictMath.ceil;
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.TEN;
-import static java.math.BigInteger.valueOf;
+import static java.math.BigInteger.*;
 
 
 public class PrimalityChecker {
@@ -18,8 +15,8 @@ public class PrimalityChecker {
 
     public static boolean isPrime(BigInteger number) {
         return number.compareTo(ONE) < 1 ? false :
-               number.compareTo(THREE) < 1 ? true :
-               number.compareTo(TEN) < 1 ? isPrime(number, 3) : isPrime(number, 10);
+                number.compareTo(THREE) < 1 ? true :
+                        number.compareTo(TEN) < 1 ? isPrime(number, 3) : isPrime(number, 10);
     }
 
     private static boolean isPrime(BigInteger number, int m) {
@@ -30,7 +27,7 @@ public class PrimalityChecker {
             if (!b.modPow(number.subtract(ONE), number).equals(ONE)) return false;
             if (k_List == null) k_List = getKList(number);
             for (BigInteger k : k_List) {
-                BigInteger greatestCommonDivisor = number.gcd(b.modPow(k, number).subtract(ONE));
+                BigInteger greatestCommonDivisor = b.modPow(k, number).subtract(ONE).gcd(number);
                 if (greatestCommonDivisor.compareTo(ONE) == 1 && greatestCommonDivisor.compareTo(number) == -1)
                     return false;
             }
@@ -59,24 +56,17 @@ public class PrimalityChecker {
         return result;
     }
 
+
     private static ArrayList<BigInteger> getKList(BigInteger n) {
         ArrayList<BigInteger> k_List = new ArrayList<>();
-        BigDecimal numerator = new BigDecimal(n.subtract(ONE));
-        BigInteger limit = floorLog_2(numerator);
-        for (BigInteger j = ONE; j.compareTo(limit) < 1; j = j.add(ONE)) {
-            BigDecimal k = numerator.divide(new BigDecimal(TWO.modPow(j, n)));
-            if (k.equals(new BigDecimal(k.toBigInteger()))) k_List.add(k.toBigInteger());
+        BigInteger numerator = n.subtract(ONE);
+        BigInteger[] k;
+        for (BigInteger j = valueOf(numerator.bitLength() - 1); j.compareTo(ONE) > 0; j = j.subtract(ONE)) {
+            k = numerator.divideAndRemainder(TWO.modPow(j, n));
+            if (k[1].equals(ZERO))
+                k_List.add(k[0]);
         }
         return k_List;
-    }
-
-    /*
-    *
-    * The following function approaches "floor(log_2 n)", where n is a BigDecimal
-    *
-    * */
-    private static BigInteger floorLog_2(BigDecimal n) {
-        return valueOf(n.toBigInteger().bitLength() - 1);
     }
 
 }

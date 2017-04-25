@@ -26,14 +26,23 @@ public class PrimalityChecker_ {
 
     private void assertFile(File file) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(file));
+        long total = 0;
+        long lines = 0;
         while (true) {
             String number = reader.readLine();
             if (number == null) break;
-            if (file.getName().equals("primes.txt"))
-                assertTrue(PrimalityChecker.isPrime(new BigInteger(number)));
-            else
-                assertFalse(PrimalityChecker.isPrime(new BigInteger(number)));
+            boolean isPrime;
+            long start = System.nanoTime();
+            isPrime = PrimalityChecker.isPrime(new BigInteger(number));
+            total += System.nanoTime() - start;
+            lines++;
+            if (file.getName().equals("primes.txt")) {
+                assertTrue(isPrime);
+            } else {
+                assertFalse(isPrime);
+            }
         }
+        System.out.println("Tiempo (seg): " + total/1e9 + " Numeros: " + lines);
         reader.close();
     }
 
